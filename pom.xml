@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>mx.lonsung</groupId>
 	<artifactId>simulador</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.2</version>
 	<name>simulador</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -59,7 +59,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.5</version>
+			<version>5.5.1</version>
 		</dependency>
 
 		<dependency>

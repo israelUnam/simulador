@@ -72,6 +72,11 @@ public class ExamenController {
         model.addAttribute("examen", examen);
         model.addAttribute("examenPreguntas", items);
         model.addAttribute("totalPreguntas", items.size());
+        if (examen.getFechaHoraInicio() != null) {
+            model.addAttribute("tiempoTranscurridoSegundos", ChronoUnit.SECONDS.between(examen.getFechaHoraInicio(), LocalDateTime.now()));
+        } else {
+            model.addAttribute("tiempoTranscurridoSegundos", 0L);
+        }
 
         if (principal != null) {
             model.addAttribute("userName", principal.getAttribute("name"));
@@ -135,6 +140,11 @@ public class ExamenController {
         model.addAttribute("numPregunta", num);
         model.addAttribute("totalPreguntas", items.size());
         model.addAttribute("siguiente", num < items.size() ? num + 1 : null);
+        if (examen.getFechaHoraInicio() != null) {
+            model.addAttribute("tiempoTranscurridoSegundos", ChronoUnit.SECONDS.between(examen.getFechaHoraInicio(), LocalDateTime.now()));
+        } else {
+            model.addAttribute("tiempoTranscurridoSegundos", 0L);
+        }
 
         if (principal != null) {
             model.addAttribute("userName", principal.getAttribute("name"));

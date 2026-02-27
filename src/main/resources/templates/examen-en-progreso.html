@@ -36,7 +36,7 @@
                 <p class="text-muted mb-4 text-white" th:text="${examen != null ? examen.tipoExamen?.descripcion : ''}">Tipo de examen</p>
                 <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
                     <p class="text-white small mb-0" th:text="'Pregunta ' + ${numPregunta} + ' de ' + ${totalPreguntas}">Pregunta 1 de N</p>
-                    <p class="text-white small mb-0" id="tiempoTranscurrido" data-inicio="" th:attr="data-inicio=${examen != null and examen.fechaHoraInicio != null ? #temporals.format(examen.fechaHoraInicio, 'yyyy-MM-dd''T''HH:mm:ss') : ''}">
+                    <p class="text-white small mb-0" id="tiempoTranscurrido" th:attr="data-elapsed-segundos=${tiempoTranscurridoSegundos != null ? tiempoTranscurridoSegundos : 0}">
                         <span class="opacity-75">Tiempo transcurrido:</span> <strong id="tiempoTranscurridoValor">00:00:00</strong>
                     </p>
                 </div>
@@ -100,13 +100,15 @@
     var el = document.getElementById('tiempoTranscurrido');
     var valorEl = document.getElementById('tiempoTranscurridoValor');
     if (!el || !valorEl) return;
-    var inicioStr = el.getAttribute('data-inicio');
-    if (!inicioStr) return;
-    var inicio = new Date(inicioStr.replace(' ', 'T'));
-    if (isNaN(inicio.getTime())) return;
+    var elapsedStr = el.getAttribute('data-elapsed-segundos');
+    if (elapsedStr === null || elapsedStr === '') return;
+    var initialSeg = parseInt(elapsedStr, 10);
+    if (isNaN(initialSeg)) initialSeg = 0;
+    if (initialSeg < 0) initialSeg = 0;
+    var loadTime = Date.now();
     function pad(n) { return (n < 10 ? '0' : '') + n; }
     function actualizar() {
-        var seg = Math.floor((Date.now() - inicio.getTime()) / 1000);
+        var seg = initialSeg + Math.floor((Date.now() - loadTime) / 1000);
         if (seg < 0) seg = 0;
         var h = Math.floor(seg / 3600);
         var m = Math.floor((seg % 3600) / 60);
