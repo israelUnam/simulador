@@ -30,15 +30,11 @@ Aplicación web para realizar simulacros de exámenes. Los usuarios inician sesi
    FLUSH PRIVILEGES;
    ```
 
-2. **Credenciales**
+2. **Configuración**
 
-   Las credenciales sensibles se configuran mediante variables de entorno o un archivo local:
+   Copia `src/main/resources/application.properties.example` a `src/main/resources/application.properties` (este archivo no se sube al repositorio).
 
-   - **Opción A (recomendada):** Copia `application-local.properties.example` a `application-local.properties` en la raíz del proyecto y completa los valores. Este archivo está en `.gitignore` y no se sube al repositorio.
-
-   - **Opción B:** Define las variables de entorno `DB_PASSWORD`, `OAUTH_GOOGLE_CLIENT_ID` y `OAUTH_GOOGLE_CLIENT_SECRET` antes de ejecutar.
-
-   Propiedades configurables: `spring.datasource.url` (host, puerto, BD), `spring.datasource.username`, y las credenciales de Google OAuth2.
+   Las credenciales sensibles: crea `application-local.properties` en la raíz del proyecto con `DB_PASSWORD`, `OAUTH_GOOGLE_CLIENT_ID` y `OAUTH_GOOGLE_CLIENT_SECRET`, o define esas variables de entorno antes de ejecutar.
 
 3. **Google Cloud Console**
 

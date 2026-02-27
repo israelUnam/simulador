@@ -3,6 +3,7 @@ target/
 
 # Credenciales locales (no subir a repositorio público)
 application-local.properties
+src/main/resources/application.properties
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

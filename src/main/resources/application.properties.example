@@ -1,8 +1,15 @@
+# Copiar este archivo a application.properties
+# Para credenciales, crear application-local.properties en la raíz del proyecto con:
+#   DB_PASSWORD=tu_password_mysql
+#   OAUTH_GOOGLE_CLIENT_ID=tu_client_id.apps.googleusercontent.com
+#   OAUTH_GOOGLE_CLIENT_SECRET=tu_client_secret
+#   OAUTH_GOOGLE_REDIRECT_URI=http://localhost:8021/login/oauth2/code/google
+
 spring.application.name=simulador
 server.port=8021
 
 # MySQL
-spring.datasource.url=jdbc:mysql://localhost:3306/simulador?useUnicode=true&characterEncoding=UTF-8&serverTimezone=America/Mexico_City&useSSL=false&allowPublicKeyRetrieval=true
+spring.datasource.url=jdbc:mysql://localhost:3316/simulador?useUnicode=true&characterEncoding=UTF-8&serverTimezone=America/Mexico_City&useSSL=false&allowPublicKeyRetrieval=true
 spring.datasource.username=usimulador
 spring.datasource.password=${DB_PASSWORD:}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
