@@ -26,6 +26,7 @@ public class DataInitializer {
             Permiso accesoExamen = permisoRepository.save(new Permiso(null, "ACCESO_EXAMEN", "Acceso a la página de examen"));
             Permiso verBitacora = permisoRepository.save(new Permiso(null, "VER_BITACORA", "Consulta de bitácora de accesos"));
             Permiso adminUsuarios = permisoRepository.save(new Permiso(null, "ADMIN_USUARIOS", "Administración de usuarios y permisos"));
+            Permiso cargaExcel = permisoRepository.save(new Permiso(null, "CARGA_EXCEL", "Importación de preguntas desde Excel"));
 
             Rol usuario = new Rol();
             usuario.setNombre("USUARIO");
@@ -34,7 +35,7 @@ public class DataInitializer {
 
             Rol administrador = new Rol();
             administrador.setNombre("ADMINISTRADOR");
-            administrador.setPermisos(List.of(accesoExamen, verBitacora, adminUsuarios));
+            administrador.setPermisos(List.of(accesoExamen, verBitacora, adminUsuarios, cargaExcel));
             rolRepository.save(administrador);
         };
     }
