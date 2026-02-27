@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar examen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<header class="app-header">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between py-2 px-3">
+            <div class="d-flex align-items-center gap-3">
+                <span class="app-header-logo">SE</span>
+                <span class="app-header-title d-none d-md-inline">Simulador del Examen</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-sm-block">
+                    <div class="app-header-name" th:text="${userName} ?: 'Usuario'">Usuario</div>
+                    <div class="app-header-email helper-text" th:text="${userEmail}">correo@ejemplo.com</div>
+                </div>
+                <img th:if="${userPicture}" th:src="${userPicture}" alt="Foto" class="app-header-avatar" referrerpolicy="no-referrer" loading="lazy"/>
+                <a th:href="@{/examen}" class="btn btn-sm btn-outline-light">Examen</a>
+                <a th:if="${puedeCargarExcel}" th:href="@{/importar-preguntas}" class="btn btn-sm btn-outline-light">Importar preguntas</a>
+                <a th:href="@{/logout}" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container-fluid examen-wrapper d-flex flex-column align-items-center px-3 py-4">
+    <div class="row w-100 justify-content-center" style="max-width: 1400px;">
+        <div class="col-12">
+            <div class="content-card p-4 p-md-5">
+                <h1 class="h3 fw-semibold mb-4">Agregar examen</h1>
+                <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}">Error</div>
+
+                <form id="formAgregarExamen" th:action="@{/crear-examen}" method="post" class="needs-validation" novalidate>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="tipoExamen" class="form-label">Tipo de examen</label>
+                            <select id="tipoExamen" name="tipoExamen" class="form-select" required>
+                                <option value="">-- Seleccione un tipo --</option>
+                                <option th:each="tipo : ${tiposExamen}"
+                                        th:value="${tipo.idExamen}"
+                                        th:text="${tipo.descripcion}"
+                                        th:attr="data-cantidad=${cantidadPreguntasPorTipo != null ? cantidadPreguntasPorTipo[tipo.idExamen] : 0}"></option>
+                            </select>
+                            <p class="form-text text-muted mb-0" id="preguntasDisponiblesText">Preguntas disponibles para el tipo seleccionado: —</p>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label for="numPreguntas" class="form-label">Número de preguntas del examen</label>
+                            <input type="number" id="numPreguntas" name="numPreguntas" class="form-control" min="1" step="1"
+                                   placeholder="0" title="Puede modificar este valor">
+                            <p class="form-text text-muted mb-0">Puede cambiar este número según el tipo elegido.</p>
+                        </div>
+                        <div class="col-12 mt-2">
+                            <button type="submit" id="btnCrearExamen" class="btn btn-primary" disabled>Crear Examen</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script th:inline="javascript">
+(function() {
+    var select = document.getElementById('tipoExamen');
+    var numPreguntas = document.getElementById('numPreguntas');
+    var preguntasDisponiblesText = document.getElementById('preguntasDisponiblesText');
+
+    function actualizarPreguntas() {
+        if (!select || !numPreguntas) return;
+        var opt = select.options[select.selectedIndex];
+        var cantidad = opt && opt.getAttribute('data-cantidad') != null ? parseInt(opt.getAttribute('data-cantidad'), 10) : 0;
+        if (isNaN(cantidad)) cantidad = 0;
+        preguntasDisponiblesText.textContent = 'Preguntas disponibles para el tipo seleccionado: ' + (cantidad || '—');
+        numPreguntas.value = cantidad > 0 ? cantidad : '';
+        numPreguntas.min = 1;
+        numPreguntas.max = cantidad > 0 ? cantidad : '';
+    }
+
+    function actualizarBotonCrear() {
+        var btn = document.getElementById('btnCrearExamen');
+        if (!btn) return;
+        var val = select.value;
+        btn.disabled = !val || val.trim() === '';
+    }
+
+    if (select) {
+        select.addEventListener('change', function() {
+            actualizarPreguntas();
+            actualizarBotonCrear();
+        });
+        actualizarPreguntas();
+        actualizarBotonCrear();
+    }
+})();
+</script>
+</body>
+</html>

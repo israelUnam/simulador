@@ -1,0 +1,10 @@
+# Copiar este archivo a application-local.properties en la raíz del proyecto
+# y completar con tus credenciales. application-local.properties está en .gitignore
+
+# Base de datos MySQL
+DB_PASSWORD=tu_password_mysql
+
+# Google OAuth2 (crear credenciales en https://console.cloud.google.com/)
+OAUTH_GOOGLE_CLIENT_ID=tu_client_id.apps.googleusercontent.com
+OAUTH_GOOGLE_CLIENT_SECRET=tu_client_secret
+OAUTH_GOOGLE_REDIRECT_URI=http://localhost:8021/login/oauth2/code/google

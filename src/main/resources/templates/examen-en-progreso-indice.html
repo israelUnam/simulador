@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Preguntas del examen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<header class="app-header">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between py-2 px-3">
+            <div class="d-flex align-items-center gap-3">
+                <span class="app-header-logo">SE</span>
+                <span class="app-header-title d-none d-md-inline">Simulador del Examen</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-sm-block">
+                    <div class="app-header-name" th:text="${userName} ?: 'Usuario'">Usuario</div>
+                    <div class="app-header-email helper-text" th:text="${userEmail}">correo@ejemplo.com</div>
+                </div>
+                <img th:if="${userPicture}" th:src="${userPicture}" alt="Foto" class="app-header-avatar" referrerpolicy="no-referrer" loading="lazy"/>
+                <a th:href="@{/examen}" class="btn btn-sm btn-outline-light">Examen</a>
+                <a th:if="${puedeCargarExcel}" th:href="@{/importar-preguntas}" class="btn btn-sm btn-outline-light">Importar preguntas</a>
+                <a th:href="@{/logout}" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container-fluid examen-wrapper d-flex flex-column align-items-center px-3 py-4">
+    <div class="row w-100 justify-content-center" style="max-width: 700px;">
+        <div class="col-12">
+            <div class="content-card p-4 p-md-5">
+                <h1 class="h3 fw-semibold mb-2 text-white">Preguntas del examen</h1>
+                <p class="text-white small mb-2" th:text="${examen != null ? examen.tipoExamen?.descripcion : ''}">Tipo de examen</p>
+                <p class="text-white small mb-4" id="tiempoTranscurrido" th:attr="data-inicio=${examen != null and examen.fechaHoraInicio != null ? #temporals.format(examen.fechaHoraInicio, 'yyyy-MM-dd''T''HH:mm:ss') : ''}">
+                    <span class="opacity-75">Tiempo transcurrido:</span> <strong id="tiempoTranscurridoValor">00:00:00</strong>
+                </p>
+                <p class="text-white mb-4">Seleccione una pregunta para responder:</p>
+                <div class="mb-4">
+                    <form th:if="${examen?.id != null}" th:action="@{/examen-en-progreso/finalizar}" method="post" class="d-inline" id="formFinalizar">
+                        <input type="hidden" name="id" th:value="${examen.id}"/>
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalFinalizar">Finalizar examen</button>
+                    </form>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent border-0 px-0" th:each="ep, iterStat : ${examenPreguntas}">
+                        <a th:href="@{/examen-en-progreso(id=${examen.id}, num=${iterStat.count})}" class="text-decoration-none text-white d-block py-3">
+                            <span class="d-block fw-semibold">
+                                <span th:text="'Pregunta ' + ${iterStat.count}">Pregunta 1</span>
+                                <span th:if="${ep.preguntaPendiente == true}" class="badge bg-warning text-dark ms-2">Pendiente</span>
+                                <span th:if="${ep.respuesta != null && !#strings.isEmpty(ep.respuesta)}" class="badge bg-success ms-2">Contestada</span>
+                            </span>
+                            <span class="d-block small mt-1 opacity-75" th:text="${ep.pregunta != null ? ep.pregunta.pregunta : ''}">Contenido de la pregunta</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalFinalizar" tabindex="-1" aria-labelledby="modalFinalizarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFinalizarLabel">Finalizar examen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Terminar el examen ahora?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="formFinalizar" class="btn btn-danger" data-bs-dismiss="modal">Sí, terminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script th:inline="javascript">
+(function() {
+    var el = document.getElementById('tiempoTranscurrido');
+    var valorEl = document.getElementById('tiempoTranscurridoValor');
+    if (!el || !valorEl) return;
+    var inicioStr = el.getAttribute('data-inicio');
+    if (!inicioStr) return;
+    var inicio = new Date(inicioStr.replace(' ', 'T'));
+    if (isNaN(inicio.getTime())) return;
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function actualizar() {
+        var seg = Math.floor((Date.now() - inicio.getTime()) / 1000);
+        if (seg < 0) seg = 0;
+        var h = Math.floor(seg / 3600);
+        var m = Math.floor((seg % 3600) / 60);
+        var s = seg % 60;
+        valorEl.textContent = pad(h) + ':' + pad(m) + ':' + pad(s);
+    }
+    actualizar();
+    setInterval(actualizar, 1000);
+})();
+</script>
+</body>
+</html>
