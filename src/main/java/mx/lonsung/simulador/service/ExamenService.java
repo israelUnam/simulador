@@ -10,6 +10,7 @@ import mx.lonsung.simulador.repository.ExamenRepository;
 import mx.lonsung.simulador.repository.PreguntaRepository;
 import mx.lonsung.simulador.repository.TipoExamenRepository;
 import mx.lonsung.simulador.repository.UsuarioPermisoRepository;
+import mx.lonsung.simulador.config.DataInitializer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class ExamenService {
 
     private static final String ESTADO_EN_CURSO = "EN_CURSO";
+    private static final String TIPO_TODAS_LAS_AREAS = DataInitializer.DESCRIPCION_TODAS_LAS_AREAS;
 
     private final ExamenRepository examenRepository;
     private final ExamenPreguntaRepository examenPreguntaRepository;
@@ -60,7 +62,12 @@ public class ExamenService {
         examen.setEstado(ESTADO_EN_CURSO);
         examen = examenRepository.save(examen);
 
-        List<Pregunta> todas = preguntaRepository.findByTipoExamen_IdExamen(idTipoExamen);
+        List<Pregunta> todas;
+        if (TIPO_TODAS_LAS_AREAS.equalsIgnoreCase(tipoExamen.getDescripcion())) {
+            todas = preguntaRepository.findAll();
+        } else {
+            todas = preguntaRepository.findByTipoExamen_IdExamen(idTipoExamen);
+        }
         if (todas.isEmpty()) {
             return examen;
         }

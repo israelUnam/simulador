@@ -44,12 +44,13 @@
                                 <option th:each="tipo : ${tiposExamen}"
                                         th:value="${tipo.idExamen}"
                                         th:text="${tipo.descripcion}"
-                                        th:attr="data-cantidad=${cantidadPreguntasPorTipo != null ? cantidadPreguntasPorTipo[tipo.idExamen] : 0}"></option>
+                                        th:attr="data-cantidad=${cantidadPreguntasPorTipo != null ? cantidadPreguntasPorTipo[tipo.idExamen] : 0}, data-todas-areas=${idTipoTodasLasAreas != null && tipo.idExamen == idTipoTodasLasAreas ? 'true' : null}"></option>
                             </select>
                             <p class="form-text text-muted mb-0" id="preguntasDisponiblesText">Preguntas disponibles para el tipo seleccionado: —</p>
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="numPreguntas" class="form-label">Número de preguntas del examen</label>
+                            <input type="hidden" id="numPreguntasHidden" name="numPreguntas" value="200" disabled>
                             <input type="number" id="numPreguntas" name="numPreguntas" class="form-control" min="1" step="1"
                                    placeholder="0" title="Puede modificar este valor">
                             <p class="form-text text-muted mb-0">Puede cambiar este número según el tipo elegido.</p>
@@ -68,17 +69,41 @@
 (function() {
     var select = document.getElementById('tipoExamen');
     var numPreguntas = document.getElementById('numPreguntas');
+    var numPreguntasHidden = document.getElementById('numPreguntasHidden');
     var preguntasDisponiblesText = document.getElementById('preguntasDisponiblesText');
+
+    var TEXTO_TODAS_AREAS = '200 preguntas todas las áreas';
 
     function actualizarPreguntas() {
         if (!select || !numPreguntas) return;
         var opt = select.options[select.selectedIndex];
+        var optText = opt ? (opt.textContent || opt.innerText || '').trim() : '';
+        var todasAreas = opt && (opt.getAttribute('data-todas-areas') === 'true' || optText === TEXTO_TODAS_AREAS);
         var cantidad = opt && opt.getAttribute('data-cantidad') != null ? parseInt(opt.getAttribute('data-cantidad'), 10) : 0;
         if (isNaN(cantidad)) cantidad = 0;
         preguntasDisponiblesText.textContent = 'Preguntas disponibles para el tipo seleccionado: ' + (cantidad || '—');
-        numPreguntas.value = cantidad > 0 ? cantidad : '';
-        numPreguntas.min = 1;
-        numPreguntas.max = cantidad > 0 ? cantidad : '';
+        if (todasAreas) {
+            numPreguntas.value = '200';
+            numPreguntas.disabled = true;
+            numPreguntas.min = 200;
+            numPreguntas.max = 200;
+            numPreguntas.removeAttribute('name');
+            if (numPreguntasHidden) {
+                numPreguntasHidden.value = '200';
+                numPreguntasHidden.removeAttribute('disabled');
+                numPreguntasHidden.setAttribute('name', 'numPreguntas');
+            }
+        } else {
+            numPreguntas.value = cantidad > 0 ? cantidad : '';
+            numPreguntas.disabled = false;
+            numPreguntas.min = 1;
+            numPreguntas.max = cantidad > 0 ? cantidad : '';
+            numPreguntas.setAttribute('name', 'numPreguntas');
+            if (numPreguntasHidden) {
+                numPreguntasHidden.setAttribute('disabled', 'disabled');
+                numPreguntasHidden.removeAttribute('name');
+            }
+        }
     }
 
     function actualizarBotonCrear() {

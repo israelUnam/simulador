@@ -11,6 +11,7 @@ import mx.lonsung.simulador.repository.ExamenRepository;
 import mx.lonsung.simulador.repository.PreguntaRepository;
 import mx.lonsung.simulador.repository.TipoExamenRepository;
 import mx.lonsung.simulador.repository.UsuarioPermisoRepository;
+import mx.lonsung.simulador.config.DataInitializer;
 
 import java.util.HashMap;
 import java.util.List;
@@ -204,11 +205,19 @@ public class HomeController {
 
         List<TipoExamen> tiposExamen = tipoExamenRepository.findAll();
         Map<Long, Long> cantidadPreguntasPorTipo = new HashMap<>();
+        Long idTipoTodasLasAreas = tipoExamenRepository
+                .findByDescripcionIgnoreCase(DataInitializer.DESCRIPCION_TODAS_LAS_AREAS)
+                .map(TipoExamen::getIdExamen)
+                .orElse(null);
         for (TipoExamen t : tiposExamen) {
-            cantidadPreguntasPorTipo.put(t.getIdExamen(), preguntaRepository.countByTipoExamen_IdExamen(t.getIdExamen()));
+            long cantidad = idTipoTodasLasAreas != null && idTipoTodasLasAreas.equals(t.getIdExamen())
+                    ? preguntaRepository.count()
+                    : preguntaRepository.countByTipoExamen_IdExamen(t.getIdExamen());
+            cantidadPreguntasPorTipo.put(t.getIdExamen(), cantidad);
         }
         model.addAttribute("tiposExamen", tiposExamen);
         model.addAttribute("cantidadPreguntasPorTipo", cantidadPreguntasPorTipo);
+        model.addAttribute("idTipoTodasLasAreas", idTipoTodasLasAreas);
 
         return "agregar-examen";
     }
