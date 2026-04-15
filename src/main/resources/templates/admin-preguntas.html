@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccione Examen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}">
+    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : 'X-CSRF-TOKEN'}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+<header class="app-header">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center justify-content-between py-2 px-3">
+            <div class="d-flex align-items-center gap-3">
+                <span class="app-header-logo">SE</span>
+                <span class="app-header-title d-none d-md-inline">Simulador del Examen</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-sm-block">
+                    <div class="app-header-name" th:text="${userName} ?: 'Usuario'">Usuario</div>
+                    <div class="app-header-email helper-text" th:text="${userEmail}">correo@ejemplo.com</div>
+                </div>
+                <img th:if="${userPicture}" th:src="${userPicture}" alt="Foto" class="app-header-avatar" referrerpolicy="no-referrer" loading="lazy"/>
+                <a th:href="@{/admin}" class="btn btn-sm btn-outline-light">Volver a Administración</a>
+                <a th:href="@{/examen}" class="btn btn-sm btn-outline-light">Volver al Examen</a>
+                <a th:href="@{/logout}" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container-fluid examen-wrapper d-flex flex-column align-items-center px-3 py-4">
+    <div class="row w-100 justify-content-center" style="max-width: 900px;">
+        <div class="col-12">
+            <div class="content-card p-4 p-md-5">
+                <h1 class="h3 fw-semibold mb-4">Seleccione Examen</h1>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label for="tipoExamen" class="form-label">Tipo de examen</label>
+                        <select id="tipoExamen" name="tipoExamen" class="form-select" required>
+                            <option value="">-- Seleccione un tipo --</option>
+                            <option th:each="tipo : ${tiposExamen}"
+                                    th:value="${tipo.idExamen}"
+                                    th:text="${tipo.descripcion}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <p class="form-text text-white mb-2" id="preguntasInfo">Seleccione un tipo de examen para ver sus preguntas.</p>
+                        <div class="mb-3">
+                            <button type="button" id="btnNuevaPregunta" class="btn btn-outline-primary btn-sm" disabled>Agregar pregunta</button>
+                        </div>
+                        <div id="preguntasBody" class="d-grid gap-3">
+                            <div class="border rounded p-3 text-muted">Sin datos.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="preguntaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="preguntaFormTitle">Nueva pregunta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-2">
+                    <div class="col-12">
+                        <label for="preguntaText" class="form-label mb-1">Pregunta</label>
+                        <textarea id="preguntaText" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="answer1" class="form-label mb-1">Respuesta 1</label>
+                        <textarea id="answer1" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="answer2" class="form-label mb-1">Respuesta 2</label>
+                        <textarea id="answer2" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="answer3" class="form-label mb-1">Respuesta 3</label>
+                        <textarea id="answer3" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="answer4" class="form-label mb-1">Respuesta 4</label>
+                        <textarea id="answer4" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="respuestaCorrecta" class="form-label mb-1">Respuesta correcta</label>
+                        <select id="respuestaCorrecta" class="form-select">
+                            <option value="">-- Seleccione --</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="enrichQuestion" class="form-label mb-1">Enrich Question</label>
+                        <textarea id="enrichQuestion" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label for="feedback" class="form-label mb-1">Feedback</label>
+                        <textarea id="feedback" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCancelarEdicion" class="btn btn-outline-secondary btn-sm d-none">Cancelar edición</button>
+                <button type="button" id="btnGuardarPregunta" class="btn btn-primary btn-sm">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script>
+(function() {
+    var select = document.getElementById('tipoExamen');
+    var body = document.getElementById('preguntasBody');
+    var info = document.getElementById('preguntasInfo');
+    var btnNuevaPregunta = document.getElementById('btnNuevaPregunta');
+    var preguntaModalEl = document.getElementById('preguntaModal');
+    var preguntaModal = preguntaModalEl ? new bootstrap.Modal(preguntaModalEl) : null;
+    var preguntaFormTitle = document.getElementById('preguntaFormTitle');
+    var btnGuardarPregunta = document.getElementById('btnGuardarPregunta');
+    var btnCancelarEdicion = document.getElementById('btnCancelarEdicion');
+    var csrfToken = document.querySelector('meta[name=\"_csrf\"]') ? document.querySelector('meta[name=\"_csrf\"]').content : '';
+    var csrfHeader = document.querySelector('meta[name=\"_csrf_header\"]') ? document.querySelector('meta[name=\"_csrf_header\"]').content : 'X-CSRF-TOKEN';
+    var editingId = null;
+
+    function getFormValues() {
+        return {
+            tipoExamenId: select.value,
+            pregunta: document.getElementById('preguntaText').value,
+            answer1: document.getElementById('answer1').value,
+            answer2: document.getElementById('answer2').value,
+            answer3: document.getElementById('answer3').value,
+            answer4: document.getElementById('answer4').value,
+            respuesta: document.getElementById('respuestaCorrecta').value,
+            enrichQuestion: document.getElementById('enrichQuestion').value,
+            feedback: document.getElementById('feedback').value
+        };
+    }
+
+    function setFormValues(item) {
+        document.getElementById('preguntaText').value = item && item.pregunta ? item.pregunta : '';
+        document.getElementById('answer1').value = item && item.answer1 ? item.answer1 : '';
+        document.getElementById('answer2').value = item && item.answer2 ? item.answer2 : '';
+        document.getElementById('answer3').value = item && item.answer3 ? item.answer3 : '';
+        document.getElementById('answer4').value = item && item.answer4 ? item.answer4 : '';
+        document.getElementById('respuestaCorrecta').value = item && item.respuesta ? String(item.respuesta) : '';
+        document.getElementById('enrichQuestion').value = item && item.enrichQuestion ? item.enrichQuestion : '';
+        document.getElementById('feedback').value = item && item.feedback ? item.feedback : '';
+    }
+
+    function startNew() {
+        editingId = null;
+        preguntaFormTitle.textContent = 'Nueva pregunta';
+        btnCancelarEdicion.classList.add('d-none');
+        setFormValues(null);
+        if (preguntaModal) {
+            preguntaModal.show();
+        }
+    }
+
+    function startEdit(item) {
+        editingId = item.idPregunta;
+        preguntaFormTitle.textContent = 'Editar pregunta #' + item.idPregunta;
+        btnCancelarEdicion.classList.remove('d-none');
+        setFormValues(item);
+        if (preguntaModal) {
+            preguntaModal.show();
+        }
+    }
+
+    function renderEmpty(text) {
+        body.innerHTML = '';
+        var card = document.createElement('div');
+        card.className = 'border rounded p-3 text-muted';
+        card.textContent = text;
+        body.appendChild(card);
+    }
+
+    function renderRows(items) {
+        body.innerHTML = '';
+        if (!items || items.length === 0) {
+            renderEmpty('No hay preguntas para el tipo seleccionado.');
+            return;
+        }
+        function asHtml(value) {
+            return value != null ? String(value) : '';
+        }
+        items.forEach(function(item) {
+            var card = document.createElement('div');
+            card.className = 'border rounded p-3';
+
+            var title = document.createElement('h6');
+            title.className = 'fw-semibold mb-2';
+            title.textContent = 'Pregunta #' + (item.idPregunta != null ? item.idPregunta : '');
+            var actions = document.createElement('div');
+            actions.className = 'mb-2';
+            var editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'btn btn-outline-secondary btn-sm';
+            editBtn.textContent = 'Editar';
+            editBtn.addEventListener('click', function() {
+                startEdit(item);
+            });
+            actions.appendChild(editBtn);
+
+            var pregunta = document.createElement('p');
+            pregunta.className = 'mb-3';
+            pregunta.innerHTML = asHtml(item.pregunta);
+
+            var correctKey = item.respuesta != null ? String(item.respuesta).trim() : '';
+            var answers = [
+                { key: '1', text: item.answer1 },
+                { key: '2', text: item.answer2 },
+                { key: '3', text: item.answer3 },
+                { key: '4', text: item.answer4 }
+            ];
+            var ul = document.createElement('ul');
+            ul.className = 'list-unstyled mb-0';
+            answers.forEach(function(ans) {
+                if (!ans.text) return;
+                var li = document.createElement('li');
+                li.className = 'mb-1 px-2 py-1 rounded';
+                if (ans.key === correctKey) {
+                    li.classList.add('bg-success-subtle', 'text-success-emphasis');
+                }
+                li.innerHTML = ans.key + ') ' + asHtml(ans.text);
+                ul.appendChild(li);
+            });
+
+            var respuestasLabel = document.createElement('p');
+            respuestasLabel.className = 'mb-1 fw-semibold';
+            respuestasLabel.textContent = 'Respuestas';
+
+            var enrichLabel = document.createElement('p');
+            enrichLabel.className = 'mb-1 mt-3 fw-semibold';
+            enrichLabel.textContent = 'Enrich Question';
+
+            var enrichText = document.createElement('p');
+            enrichText.className = 'mb-2';
+            enrichText.innerHTML = asHtml(item.enrichQuestion);
+
+            var feedbackLabel = document.createElement('p');
+            feedbackLabel.className = 'mb-1 fw-semibold';
+            feedbackLabel.textContent = 'Feedback';
+
+            var feedbackText = document.createElement('p');
+            feedbackText.className = 'mb-0';
+            feedbackText.innerHTML = asHtml(item.feedback);
+
+            card.appendChild(title);
+            card.appendChild(actions);
+            card.appendChild(pregunta);
+            card.appendChild(respuestasLabel);
+            card.appendChild(ul);
+            card.appendChild(enrichLabel);
+            card.appendChild(enrichText);
+            card.appendChild(feedbackLabel);
+            card.appendChild(feedbackText);
+            body.appendChild(card);
+        });
+    }
+
+    function cargarPreguntas() {
+        var id = select.value;
+        btnNuevaPregunta.disabled = !id;
+        if (!id) {
+            info.textContent = 'Seleccione un tipo de examen para ver sus preguntas.';
+            renderEmpty('Sin datos.');
+            if (preguntaModal) {
+                preguntaModal.hide();
+            }
+            return;
+        }
+        info.textContent = 'Cargando preguntas...';
+        fetch('/admin/preguntas/lista?tipoExamenId=' + encodeURIComponent(id), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(function(resp) { return resp.ok ? resp.json() : []; })
+            .then(function(data) {
+                info.textContent = 'Preguntas encontradas: ' + (data ? data.length : 0);
+                renderRows(data || []);
+            })
+            .catch(function() {
+                info.textContent = 'Ocurrió un error al cargar las preguntas.';
+                renderEmpty('No fue posible cargar la información.');
+            });
+    }
+
+    function guardarPregunta() {
+        if (!select.value) {
+            info.textContent = 'Seleccione un tipo de examen.';
+            return;
+        }
+        var payload = getFormValues();
+        if (!payload.pregunta || !payload.pregunta.trim()) {
+            info.textContent = 'La pregunta es obligatoria.';
+            return;
+        }
+        var isEdit = editingId != null;
+        var url = isEdit ? '/admin/preguntas/' + encodeURIComponent(editingId) : '/admin/preguntas';
+        var method = isEdit ? 'PUT' : 'POST';
+        var headers = {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        if (csrfToken) {
+            headers[csrfHeader || 'X-CSRF-TOKEN'] = csrfToken;
+        }
+        fetch(url, {
+            method: method,
+            headers: headers,
+            body: JSON.stringify(payload)
+        })
+            .then(function(resp) { return resp.ok ? resp.json() : { ok: false, error: 'No fue posible guardar.' }; })
+            .then(function(result) {
+                if (!result || result.ok !== true) {
+                    info.textContent = result && result.error ? result.error : 'No fue posible guardar.';
+                    return;
+                }
+                info.textContent = isEdit ? 'Pregunta actualizada correctamente.' : 'Pregunta agregada correctamente.';
+                editingId = null;
+                btnCancelarEdicion.classList.add('d-none');
+                setFormValues(null);
+                if (preguntaModal) {
+                    preguntaModal.hide();
+                }
+                cargarPreguntas();
+            })
+            .catch(function() {
+                info.textContent = 'Ocurrió un error al guardar la pregunta.';
+            });
+    }
+
+    if (select) {
+        select.addEventListener('change', cargarPreguntas);
+    }
+    if (btnNuevaPregunta) {
+        btnNuevaPregunta.addEventListener('click', startNew);
+    }
+    if (btnGuardarPregunta) {
+        btnGuardarPregunta.addEventListener('click', guardarPregunta);
+    }
+    if (btnCancelarEdicion) {
+        btnCancelarEdicion.addEventListener('click', startNew);
+    }
+})();
+</script>
+</body>
+</html>

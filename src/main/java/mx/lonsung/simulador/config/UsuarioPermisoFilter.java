@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class UsuarioPermisoFilter extends OncePerRequestFilter {
 
-    private static final java.util.Set<String> RUTAS_PROTEGIDAS = java.util.Set.of("/examen", "/importar-preguntas", "/agregar-examen", "/crear-examen", "/examen-en-progreso", "/examen-en-progreso/indice", "/examen-en-progreso/responder", "/examen-en-progreso/marcar-pendiente", "/examen-en-progreso/finalizar");
+    private static final java.util.Set<String> RUTAS_PROTEGIDAS = java.util.Set.of("/examen", "/importar-preguntas", "/agregar-examen", "/crear-examen", "/examen-en-progreso", "/examen-en-progreso/indice", "/examen-en-progreso/responder", "/examen-en-progreso/marcar-pendiente", "/examen-en-progreso/finalizar", "/admin");
 
     private final UsuarioPermisoRepository usuarioPermisoRepository;
 
