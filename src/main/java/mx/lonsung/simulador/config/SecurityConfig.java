@@ -26,7 +26,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/examen", "/examen/resultados/**", "/importar-preguntas", "/agregar-examen", "/crear-examen", "/examen-en-progreso", "/examen-en-progreso/indice", "/examen-en-progreso/responder", "/examen-en-progreso/marcar-pendiente", "/examen-en-progreso/finalizar").authenticated()
+                        .requestMatchers("/examen", "/examen/resultados/**", "/importar-preguntas", "/agregar-examen", "/crear-examen", "/examen-en-progreso", "/examen-en-progreso/indice", "/examen-en-progreso/responder", "/examen-en-progreso/marcar-pendiente", "/examen-en-progreso/finalizar", "/admin", "/admin/**").authenticated()
                         .requestMatchers("/acceso-denegado").authenticated()
                         .anyRequest().permitAll()
                 )

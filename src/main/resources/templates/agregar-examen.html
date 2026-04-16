@@ -22,7 +22,7 @@
                 </div>
                 <img th:if="${userPicture}" th:src="${userPicture}" alt="Foto" class="app-header-avatar" referrerpolicy="no-referrer" loading="lazy"/>
                 <a th:href="@{/examen}" class="btn btn-sm btn-outline-light">Examen</a>
-                <a th:if="${puedeCargarExcel}" th:href="@{/importar-preguntas}" class="btn btn-sm btn-outline-light">Importar preguntas</a>
+
                 <a th:href="@{/logout}" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
             </div>
         </div>
