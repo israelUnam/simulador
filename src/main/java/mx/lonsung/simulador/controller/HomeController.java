@@ -4,11 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mx.lonsung.simulador.entity.Examen;
 import mx.lonsung.simulador.entity.ExamenPregunta;
+import mx.lonsung.simulador.entity.GrupoProceso;
 import mx.lonsung.simulador.entity.Pregunta;
 import mx.lonsung.simulador.entity.TipoExamen;
 import mx.lonsung.simulador.entity.UsuarioPermiso;
 import mx.lonsung.simulador.repository.ExamenPreguntaRepository;
 import mx.lonsung.simulador.repository.ExamenRepository;
+import mx.lonsung.simulador.repository.GrupoProcesoRepository;
 import mx.lonsung.simulador.repository.PreguntaRepository;
 import mx.lonsung.simulador.repository.TipoExamenRepository;
 import mx.lonsung.simulador.repository.UsuarioPermisoRepository;
@@ -39,17 +41,20 @@ public class HomeController {
     private final UsuarioPermisoRepository usuarioPermisoRepository;
     private final TipoExamenRepository tipoExamenRepository;
     private final PreguntaRepository preguntaRepository;
+    private final GrupoProcesoRepository grupoProcesoRepository;
     private final ExamenRepository examenRepository;
     private final ExamenPreguntaRepository examenPreguntaRepository;
 
     public HomeController(UsuarioPermisoRepository usuarioPermisoRepository,
                          TipoExamenRepository tipoExamenRepository,
                          PreguntaRepository preguntaRepository,
+                         GrupoProcesoRepository grupoProcesoRepository,
                          ExamenRepository examenRepository,
                          ExamenPreguntaRepository examenPreguntaRepository) {
         this.usuarioPermisoRepository = usuarioPermisoRepository;
         this.tipoExamenRepository = tipoExamenRepository;
         this.preguntaRepository = preguntaRepository;
+        this.grupoProcesoRepository = grupoProcesoRepository;
         this.examenRepository = examenRepository;
         this.examenPreguntaRepository = examenPreguntaRepository;
     }
@@ -287,6 +292,7 @@ public class HomeController {
                         || !DataInitializer.DESCRIPCION_TODAS_LAS_AREAS.equalsIgnoreCase(tipo.getDescripcion()))
                 .toList();
         model.addAttribute("tiposExamen", tiposExamen);
+        model.addAttribute("gruposProceso", grupoProcesoRepository.findAll());
         return "admin-preguntas";
     }
 
@@ -316,6 +322,8 @@ public class HomeController {
                     row.put("answer3", p.getAnswer3());
                     row.put("answer4", p.getAnswer4());
                     row.put("respuesta", p.getRespuesta());
+                    row.put("idGrupoProceso", p.getGrupoProceso() != null ? p.getGrupoProceso().getIdGrupoProceso() : null);
+                    row.put("grupoProceso", p.getGrupoProceso() != null ? p.getGrupoProceso().getDescripcion() : null);
                     row.put("enrichQuestion", p.getEnrichQuestion());
                     row.put("feedback", p.getFeedback());
                     return row;
@@ -350,6 +358,7 @@ public class HomeController {
         p.setAnswer3(toString(body.get("answer3")));
         p.setAnswer4(toString(body.get("answer4")));
         p.setRespuesta(toString(body.get("respuesta")));
+        p.setGrupoProceso(resolveGrupoProceso(body.get("idGrupoProceso")));
         p.setEnrichQuestion(toString(body.get("enrichQuestion")));
         p.setFeedback(toString(body.get("feedback")));
         p = preguntaRepository.save(p);
@@ -385,6 +394,7 @@ public class HomeController {
         p.setAnswer3(toString(body.get("answer3")));
         p.setAnswer4(toString(body.get("answer4")));
         p.setRespuesta(toString(body.get("respuesta")));
+        p.setGrupoProceso(resolveGrupoProceso(body.get("idGrupoProceso")));
         p.setEnrichQuestion(toString(body.get("enrichQuestion")));
         p.setFeedback(toString(body.get("feedback")));
         preguntaRepository.save(p);
@@ -439,5 +449,10 @@ public class HomeController {
 
     private static String toString(Object value) {
         return value == null ? null : String.valueOf(value);
+    }
+
+    private GrupoProceso resolveGrupoProceso(Object idGrupoProceso) {
+        Long id = toLong(idGrupoProceso);
+        return id != null ? grupoProcesoRepository.findById(id).orElse(null) : null;
     }
 }

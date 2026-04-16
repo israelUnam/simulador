@@ -101,6 +101,15 @@
                             <option value="4">4</option>
                         </select>
                     </div>
+                    <div class="col-12 col-md-8">
+                        <label for="idGrupoProceso" class="form-label mb-1">Grupo de proceso</label>
+                        <select id="idGrupoProceso" class="form-select">
+                            <option value="">-- Seleccione --</option>
+                            <option th:each="grupo : ${gruposProceso}"
+                                    th:value="${grupo.idGrupoProceso}"
+                                    th:text="${grupo.descripcion}"></option>
+                        </select>
+                    </div>
                     <div class="col-12">
                         <label for="enrichQuestion" class="form-label mb-1">Enrich Question</label>
                         <textarea id="enrichQuestion" class="form-control" rows="3"></textarea>
@@ -144,6 +153,7 @@
             answer3: document.getElementById('answer3').value,
             answer4: document.getElementById('answer4').value,
             respuesta: document.getElementById('respuestaCorrecta').value,
+            idGrupoProceso: document.getElementById('idGrupoProceso').value,
             enrichQuestion: document.getElementById('enrichQuestion').value,
             feedback: document.getElementById('feedback').value
         };
@@ -156,6 +166,7 @@
         document.getElementById('answer3').value = item && item.answer3 ? item.answer3 : '';
         document.getElementById('answer4').value = item && item.answer4 ? item.answer4 : '';
         document.getElementById('respuestaCorrecta').value = item && item.respuesta ? String(item.respuesta) : '';
+        document.getElementById('idGrupoProceso').value = item && item.idGrupoProceso ? String(item.idGrupoProceso) : '';
         document.getElementById('enrichQuestion').value = item && item.enrichQuestion ? item.enrichQuestion : '';
         document.getElementById('feedback').value = item && item.feedback ? item.feedback : '';
     }
@@ -243,6 +254,14 @@
             respuestasLabel.className = 'mb-1 fw-semibold';
             respuestasLabel.textContent = 'Respuestas';
 
+            var grupoProcesoLabel = document.createElement('p');
+            grupoProcesoLabel.className = 'mb-1 mt-3 fw-semibold';
+            grupoProcesoLabel.textContent = 'Grupo de proceso';
+
+            var grupoProcesoText = document.createElement('p');
+            grupoProcesoText.className = 'mb-2';
+            grupoProcesoText.innerHTML = asHtml(item.grupoProceso);
+
             var enrichLabel = document.createElement('p');
             enrichLabel.className = 'mb-1 mt-3 fw-semibold';
             enrichLabel.textContent = 'Enrich Question';
@@ -264,6 +283,8 @@
             card.appendChild(pregunta);
             card.appendChild(respuestasLabel);
             card.appendChild(ul);
+            card.appendChild(grupoProcesoLabel);
+            card.appendChild(grupoProcesoText);
             card.appendChild(enrichLabel);
             card.appendChild(enrichText);
             card.appendChild(feedbackLabel);
